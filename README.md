@@ -1,2 +1,19 @@
 # Discord-Emoji-Scraper
-Scrapes emojis of a discord server/guild, in case you lost the original emojis for your own server or would like to download emojis for any other server. Supports animated and standard emojs.
+Scrapes emojis of a discord server/guild and downloads them to your machine, in case you lost the original emojis for your own server or would like to download emojis for any other server to use elsewhere. Supports animated and standard emojis.
+
+To use the program simply download the repo, extract the zip file, make sure you have python 3.9 installed, then run the .py script-: python3 emojiscraper.py. Then follow the instructions.
+
+If you have any questions create an issue in the github repo.
+If you are facing any errors, bugs or having suggestions, create an issue in the GitHub repo.
+If you would like to work on any of the TODO points in the code, feel free to work on them and add a PR
+
+WARNING! Using this tool will break the Discord TOS since you will be scraping their website.
+By using this tool, you agree that the creator of this tool has no responsibility for any action taken
+against your account or against you legally.
+I strongly recommend you to use an alt account's token with this tool.
+I strongly recommend you to use Tor, VPN or a proxy along with this tool.
+
+How to get guild ID-: https://youtu.be/6dqYctHmazc
+How to get discord account token-: https://youtu.be/YEgFvgg7ZPI
+
+
