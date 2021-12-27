@@ -2,11 +2,6 @@ import os, subprocess, sys
 subprocess.check_call([sys.executable, "-m", "pip", "install", "requests"])
 import requests
 
-#TODO add support for all guilds of a uid, or selection from guilds.
-#TODO error management
-#TODO builtin proxy support
-#TODO add compiled versions
-
 warning_info = '''
 WARNING! Using this tool will break the Discord TOS since you will be scraping their website.
 By continuing, you agree that the creator of this tool has no responsibility for any action taken
@@ -30,7 +25,6 @@ def is_none_empty_whitespace(any_string):
     if any_string.strip(" ") == "":
         return True
     return False
-
 
 def get_list_of_emojis(guild_id, token):
     result=requests.get(url=f"https://discordapp.com/api/v7/guilds/{guild_id}/emojis", headers={"authorization":token})
@@ -78,6 +72,7 @@ def try_scraping(guild_name, emoji):
         except:
             print(f"Failed to get emoji :{name}: from {guild_name} , retrying!")
         else:
+            print(f"Successfully got emoji :{name}: from {guild_name}")
             break
     return emoji_bytes
     
@@ -117,9 +112,5 @@ def main():
                 print("Thanks for using the discord emoji scraper! You can find your files at-: " + config["path"])
                 break
             print("Verification failed.")
-
-        
-
-
 
 main()
