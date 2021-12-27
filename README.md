@@ -22,3 +22,4 @@ How to get discord account token-: https://youtu.be/YEgFvgg7ZPI
 - [ ] Built-in proxy support
 - [ ] Add versions compiled to executables (like .exe for Windows, elf binaries for Linux, etc) (A GitHub deployment workflow could work here)
 - [ ] Add cooldown for x seconds after x amount of emoji(s) were downloaded
+- [ ] UI support?
