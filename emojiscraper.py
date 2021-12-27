@@ -69,13 +69,23 @@ def try_scraping(guild_name, emoji):
     while True:
         try:
             emoji_bytes = scrape_emoji(id)
-        except:
-            print(f"Failed to get emoji :{name}: from {guild_name} , retrying!")
+        except Exception as exception:
+            if exception == KeyboardInterrupt | exception == SystemExit:
+                print("KeyboardInterrupt/SystemExit caught! Terminating.")
+                raise
+            else:
+                print(f"Failed to get emoji :{name}: from {guild_name} , retrying!")
         else:
             print(f"Successfully got emoji :{name}: from {guild_name}")
             break
     return emoji_bytes
     
+def is_int(str):
+    try:
+        int(str)
+        return True
+    except ValueError:
+        return False
 
 def scrape(config):
     if not os.path.isdir(config.get("path")):
@@ -93,7 +103,7 @@ def scrape(config):
 def main():
     print(info)
     while True:
-        config = {"token":"", "guilds":[], "path":os.getcwd()}
+        config = {"token":"", "guilds":[], "path":os.getcwd(), "cooldownsec":0, "cooldownperemoji":0}
         config["token"] = input("Please enter your discord token (https://youtu.be/YEgFvgg7ZPI for help): ")
 
         while True:
@@ -105,6 +115,14 @@ def main():
         if not is_none_empty_whitespace(file_path):
             config["path"] = file_path
         
+        cooldownperemoji = input("Enter cooldown trigger per emoji (type nothing or 0 to continue without cooldown): ")
+        if (is_int(cooldownperemoji)): config["cooldownperemoji"] = int(cooldownperemoji)
+
+        if config["cooldownperemoji"] != 0:
+            cooldownsec = input("Enter the cooldown time in seconds: ")
+            if (not is_none_empty_whitespace(cooldownsec)) & (not is_int(cooldownsec)): break
+            else: config["cooldownsec"] = int(cooldownsec)
+
         print(config)
         if is_none_empty_whitespace(input("Are these settings correct? (press enter to continue or anything else to cancel): ")):
             if input(warning_info) == "I UNDERSTAND":
