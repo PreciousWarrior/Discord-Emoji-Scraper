@@ -110,7 +110,7 @@ def scrape(config):
 def main():
     print(info)
     while True:
-        config = {"token":"", "guilds":[], "path":os.getcwd(), "cooldownsec":0, "cooldownperemoji":0}
+        config = {"token":"", "guilds":[], "path":os.getcwd()+"/Emojis", "cooldownsec":0, "cooldownperemoji":0}
         config["token"] = input("Please enter your discord token (https://youtu.be/YEgFvgg7ZPI for help): ")
 
         while True:
