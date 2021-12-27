@@ -17,8 +17,8 @@ How to get guild ID-: https://youtu.be/6dqYctHmazc
 How to get discord account token-: https://youtu.be/YEgFvgg7ZPI
 
 # TODO
-- [] Add support for all guilds of a uid, or selection from guilds
-- [] Error handling
-- [] Built-in proxy support
-- [] Add versions compiled to executables (like .exe for Windows, elf binaries for Linux, etc)
-- [] Add cooldown for x seconds after x amount of emoji(s) were downloaded
+- [ ] Add support for all guilds of a uid, or selection from guilds
+- [ ] Error handling
+- [ ] Built-in proxy support
+- [ ] Add versions compiled to executables (like .exe for Windows, elf binaries for Linux, etc) (A GitHub deployment workflow could work here)
+- [ ] Add cooldown for x seconds after x amount of emoji(s) were downloaded
