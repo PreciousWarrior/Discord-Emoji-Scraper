@@ -36,6 +36,10 @@ def get_list_of_emojis(guild_id, token):
     result=requests.get(url=f"https://discordapp.com/api/v7/guilds/{guild_id}/emojis", headers={"authorization":token})
     return result.json()
 
+def get_list_of_stickers(guild_id, token):
+    result=requests.get(url=f"https://discordapp.com/api/v9/guilds/{guild_id}/stickers", headers={"authorization":token})
+    return result.json()
+
 def scrape_emoji(id, proxy=None):
     if is_none_empty_whitespace(proxy):
         result=requests.get(url=f"https://cdn.discordapp.com/emojis/{id}")
@@ -63,6 +67,21 @@ def make_server_dir(server, config):
     if not os.path.isdir(dir_path):
         os.mkdir(dir_path)
 
+def try_scraping(guild_name, emoji):
+    id = emoji.get("id")
+    name = emoji.get("name")
+    print(f"Attempting to download :{name}: from {guild_name}")
+    emoji_bytes = None
+    while True:
+        try:
+            emoji_bytes = scrape_emoji(id)
+        except:
+            print(f"Failed to get emoji :{name}: from {guild_name} , retrying!")
+        else:
+            break
+    return emoji_bytes
+    
+
 def scrape(config):
     if not os.path.isdir(config.get("path")):
         print("Path in config.json does not exist.")
@@ -71,26 +90,26 @@ def scrape(config):
     for server in servers:
         emojis = get_list_of_emojis(server, config.get("token"))
         guild_name = get_guild_name(server, config.get("token"))
-        make_server_dir(guild_name, config)
+        make_server_dir(guild_name, config) #TODO technically if the server name had special characters (not-ASCII chars) it's gonna break so add support for that "somehow"
         for emoji in emojis:
-            id = emoji.get("id")
-            name = emoji.get("name")
-            print(f"Now downloading :{name}: from {guild_name}")
-            emoji_bytes = scrape_emoji(id)
-            save(emoji_bytes, os.path.join(config.get("path"), guild_name, (name + get_image_file_extension_from_bytes(emoji_bytes))))
+            emoji_bytes = try_scraping(guild_name, emoji)
+            save(emoji_bytes, os.path.join(config.get("path"), guild_name, (emoji.get("name") + get_image_file_extension_from_bytes(emoji_bytes))))
 
 def main():
     print(info)
     while True:
         config = {"token":"", "guilds":[], "path":os.getcwd()}
         config["token"] = input("Please enter your discord token (https://youtu.be/YEgFvgg7ZPI for help): ")
+
         while True:
             id = input("Enter the guild/server ID you want to scrape for emojis (when you are done, just press enter, https://youtu.be/6dqYctHmazc for help): ")
             if is_none_empty_whitespace(id): break
             else: config["guilds"].append(id)
+        
         file_path = input("Where would you like to save your emojis? (Press enter to use the current directory): ")
         if not is_none_empty_whitespace(file_path):
             config["path"] = file_path
+        
         print(config)
         if is_none_empty_whitespace(input("Are these settings correct? (press enter to continue or anything else to cancel): ")):
             if input(warning_info) == "I UNDERSTAND":
