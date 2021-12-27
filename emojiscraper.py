@@ -1,4 +1,4 @@
-import os, subprocess, sys
+import os, subprocess, sys, time
 subprocess.check_call([sys.executable, "-m", "pip", "install", "requests"])
 import requests
 
@@ -50,7 +50,6 @@ def get_image_file_extension_from_bytes(image_bytes):
         return ".gif"
     return ".png"
 
-
 def save(img_bytes, path):
     imagefile = open(path, 'wb')
     imagefile.write(img_bytes)
@@ -95,10 +94,18 @@ def scrape(config):
     for server in servers:
         emojis = get_list_of_emojis(server, config.get("token"))
         guild_name = get_guild_name(server, config.get("token"))
+        cooldownsec = config.get("cooldownsec")
         make_server_dir(guild_name, config) #TODO technically if the server name had special characters (not-ASCII chars) it's gonna break so add support for that "somehow"
+        count = 0
         for emoji in emojis:
+            if count >= config.get("cooldownperemoji"):
+                print(f"\nCooldown reached! Cooling down for {cooldownsec} seconds.")
+                time.sleep(cooldownsec)
+                count = 0
+                print("Continuing from cooldown\n")
             emoji_bytes = try_scraping(guild_name, emoji)
             save(emoji_bytes, os.path.join(config.get("path"), guild_name, (emoji.get("name") + get_image_file_extension_from_bytes(emoji_bytes))))
+            count += 1
 
 def main():
     print(info)

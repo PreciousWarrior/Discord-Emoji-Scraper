@@ -15,11 +15,11 @@ I strongly recommend you to use an alt account's token with this tool.
 I strongly recommend you to use Tor, VPN or a proxy along with this tool.
 
 # TODO
+- [x] Error handling
+- [x] Add cooldown for x seconds after x amount of emoji(s) were downloaded
 - [ ] Add support for all guilds of a uid, or selection from guilds
-- [ ] Error handling
 - [ ] Built-in proxy support
 - [ ] Add versions compiled to executables (like .exe for Windows, elf binaries for Linux, etc) (A GitHub deployment workflow could work here)
-- [ ] Add cooldown for x seconds after x amount of emoji(s) were downloaded
 - [ ] UI support?
 
 # Tutorial videos on some stuff
