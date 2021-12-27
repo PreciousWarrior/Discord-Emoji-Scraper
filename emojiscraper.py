@@ -87,9 +87,7 @@ def is_int(str):
         return False
 
 def scrape(config):
-    if not os.path.isdir(config.get("path")):
-        print("Path in config.json does not exist.")
-
+    if not os.path.isdir(config.get("path")): raise "Path in config.json does not exist."
     servers = config.get("guilds")
     for server in servers:
         emojis = get_list_of_emojis(server, config.get("token"))
@@ -97,8 +95,9 @@ def scrape(config):
         cooldownsec = config.get("cooldownsec")
         make_server_dir(guild_name, config) #TODO technically if the server name had special characters (not-ASCII chars) it's gonna break so add support for that "somehow"
         count = 0
+        print(f"Starting emoji download for server {guild_name}")
         for emoji in emojis:
-            if count >= config.get("cooldownperemoji"):
+            if (not config.get("cooldownperemoji") <= 0) & (count >= config.get("cooldownperemoji")):
                 print(f"\nCooldown reached! Cooling down for {cooldownsec} seconds.")
                 time.sleep(cooldownsec)
                 count = 0
@@ -106,6 +105,7 @@ def scrape(config):
             emoji_bytes = try_scraping(guild_name, emoji)
             save(emoji_bytes, os.path.join(config.get("path"), guild_name, (emoji.get("name") + get_image_file_extension_from_bytes(emoji_bytes))))
             count += 1
+        print(f"Finished downloading emojis from {guild_name}")
 
 def main():
     print(info)
@@ -130,6 +130,7 @@ def main():
             if (not is_none_empty_whitespace(cooldownsec)) & (not is_int(cooldownsec)): break
             else: config["cooldownsec"] = int(cooldownsec)
 
+        print("\n")
         print(config)
         if is_none_empty_whitespace(input("Are these settings correct? (press enter to continue or anything else to cancel): ")):
             if input(warning_info) == "I UNDERSTAND":
