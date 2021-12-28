@@ -59,7 +59,7 @@ def is_int(str):
 def try_scraping(guild_name, sticker):
     id = sticker.get("id")
     name = sticker.get("name")
-    print(f"Attempting to download :{name}: from {guild_name}")
+    print(f"Attempting to download '{name}' from {guild_name}")
     sticker_bytes = None
     while True:
         try:
@@ -69,9 +69,9 @@ def try_scraping(guild_name, sticker):
                 print("KeyboardInterrupt/SystemExit caught! Terminating.")
                 raise
             else:
-                print(f"Failed to get emoji :{name}: from {guild_name} , retrying!")
+                print(f"Failed to get emoji '{name}' from {guild_name} , retrying!")
         else:
-            print(f"Successfully got emoji :{name}: from {guild_name}")
+            print(f"Successfully got emoji '{name}' from {guild_name}")
             break
     return sticker_bytes
 
