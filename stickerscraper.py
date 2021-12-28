@@ -1,6 +1,8 @@
 import os, subprocess, sys, time
 subprocess.check_call([sys.executable, "-m", "pip", "install", "requests"])
+subprocess.check_call([sys.executable, "-m", "pip", "install", "apnggif"])
 import requests
+from apnggif import apnggif
 
 warning_info = '''
 WARNING! Using this tool will break the Discord TOS since you will be scraping their website.
@@ -96,14 +98,22 @@ def scrape(config):
             if sticker.get("format_type") == 1:
                 save(sticker_bytes, os.path.join(config.get("path"), guild_name, (sticker.get("name") + ".png")))
             else:
-                save(sticker_bytes, os.path.join(config.get("path"), guild_name, (sticker.get("name") + ".apng")))
+                if config.get("convertapngtogif"):
+                    pathorigin = os.path.join(config.get("path"), guild_name, (sticker.get("name") + "_original.apng"))
+                    pathconv = os.path.join(config.get("path"), guild_name, (sticker.get("name") + ".gif"))
+                    stickername = sticker.get("name")
+                    save(sticker_bytes, pathorigin)
+                    apnggif(pathorigin, pathconv)
+                    print(f"Converted animated sticker '{stickername} from {guild_name}'")
+                else:
+                    save(sticker_bytes, os.path.join(config.get("path"), guild_name, (sticker.get("name") + ".apng")))
             count += 1
         print(f"Finished downloading stickers from {guild_name}")
 
 def main():
     print(info)
     while True:
-        config = {"token":"", "guilds":[], "path":os.getcwd()+"/Stickers", "cooldownsec":0, "cooldownpersticker":0}
+        config = {"token":"", "guilds":[], "path":os.getcwd()+"/Stickers", "cooldownsec":0, "cooldownpersticker":0, "convertapngtogif":False}
         config["token"] = input("Please enter your discord token (https://youtu.be/YEgFvgg7ZPI for help): ")
 
         while True:
@@ -122,6 +132,10 @@ def main():
             cooldownsec = input("Enter the cooldown time in seconds: ")
             if (not is_none_empty_whitespace(cooldownsec)) & (not is_int(cooldownsec)): break
             else: config["cooldownsec"] = int(cooldownsec)
+        
+        convertapngtogif = input("Would you like to convert apng files (animated stickers) to gif? Leave blank to disable (if this is enabled then original animated sticker files will have '_original' appended between their name and the file extension): ")
+        if not is_none_empty_whitespace(convertapngtogif):
+            config["convertapngtogif"] = True
 
         print("\n")
         print(config)

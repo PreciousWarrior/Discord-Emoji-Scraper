@@ -20,13 +20,13 @@ I strongly recommend you to use Tor, VPN or a proxy along with this tool.
 - [x] Error handling
 - [x] Add cooldown for x seconds after x amount of emoji(s) were downloaded
 - [x] Sticker support
+- [x] (Stickers only) Automatic conversion to conver APNG format to GIF/WEBP
 - [ ] Add support for all guilds of a uid, or selection from guilds
 - [ ] Built-in proxy support
 - [ ] Add versions compiled to executables (like .exe for Windows, elf binaries for Linux, etc) (A GitHub deployment workflow could work here)
 - [ ] UI support?
 - [ ] Rewrite the code itself to be much more cleaner
 - [ ] Merge both emoji and sticker scraper in a single python file
-- [ ] (Stickers only) Automatic conversion to conver APNG format to GIF/WEBP
 
 # Tutorial videos on some stuff
 - How to get guild ID: https://youtu.be/6dqYctHmazc
