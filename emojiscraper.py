@@ -113,6 +113,7 @@ def main():
         while True:
             id = input("Enter the guild/server ID you want to scrape for emojis (when you are done, just press enter, https://youtu.be/6dqYctHmazc for help): ")
             if is_none_empty_whitespace(id): break
+            elif not is_int(id): print("Incorrect guild id.")
             else: config["guilds"].append(id)
         
         file_path = input("Where would you like to save your emojis? (Press enter to use the current directory): ")
