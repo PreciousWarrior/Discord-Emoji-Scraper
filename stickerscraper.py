@@ -84,6 +84,9 @@ def scrape(config):
     for server in servers:
         stickers = get_list_of_stickers(server, config.get("token"))
         guild_name = get_guild_name(server, config.get("token"))
+        if guild_name == None | stickers == None:
+            print(f"Guild {server} is incorrect/doesn't exist/fail to fetch guild name or stickers.")
+            continue
         cooldownsec = config.get("cooldownsec")
         make_server_dir(guild_name, config) #TODO technically if the server name had special characters (not-ASCII chars) it's gonna break so add support for that "somehow"
         count = 0
