@@ -7,7 +7,7 @@ If you have any questions create an issue in the github repo.
 If you are facing any errors, bugs or having suggestions, create an issue in the GitHub repo.
 If you would like to work on any of the TODO points in the code, feel free to work on them and add a PR
 
-**NOTE ABOUT STICKERS:** Stickers can be both static and animated picture aswell, however animated pictures use the APNG format (Animated PNG), animated stickers will end under the ".anpg", you should use convert them to gif/webp if you want to use them.
+**NOTE ABOUT STICKERS:** Stickers can be both static and animated picture aswell, however animated pictures use the APNG format (Animated PNG), animated stickers will end under the ".anpg", you should use convert them to gif/webp if you want to use them OR when prompted to convert stickers from apng to gif then accept it.
 
 # WARNING! READ THIS BEFORE USING
 Using this tool will break the Discord TOS since you will be scraping their website.
