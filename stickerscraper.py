@@ -1,6 +1,8 @@
 import os, subprocess, sys, time
 subprocess.check_call([sys.executable, "-m", "pip", "install", "requests"])
+subprocess.check_call([sys.executable, "-m", "pip", "install", "apnggif"])
 import requests
+from apnggif import apnggif
 
 warning_info = '''
 WARNING! Using this tool will break the Discord TOS since you will be scraping their website.
@@ -26,25 +28,18 @@ def is_none_empty_whitespace(any_string):
         return True
     return False
 
-def get_list_of_emojis(guild_id, token):
-    result=requests.get(url=f"https://discordapp.com/api/v7/guilds/{guild_id}/emojis", headers={"authorization":token})
+def get_list_of_stickers(guild_id, token):
+    result=requests.get(url=f"https://discordapp.com/api/v9/guilds/{guild_id}/stickers", headers={"authorization":token})
     return result.json()
 
-def scrape_emoji(id, proxy=None):
+def scrape_sticker(id, proxy=None):
     if is_none_empty_whitespace(proxy):
-        result=requests.get(url=f"https://cdn.discordapp.com/emojis/{id}")
+        result=requests.get(url=f"https://media.discordapp.net/stickers/{id}")
         return result.content
 
 def get_guild_name(guild_id, token):
     result=requests.get(url=f"https://discordapp.com/api/v7/guilds/{guild_id}", headers={"authorization":token})
     return result.json().get("name")
-
-def get_image_file_extension_from_bytes(image_bytes):
-    if str(image_bytes)[0:7].find("PNG") != -1:
-        return ".png"
-    if str(image_bytes)[0:7].find("GIF") != -1:
-        return ".gif"
-    return ".png"
 
 def save(img_bytes, path):
     imagefile = open(path, 'wb')
@@ -56,25 +51,6 @@ def make_server_dir(server, config):
     if not os.path.isdir(dir_path):
         os.mkdir(dir_path)
 
-def try_scraping(guild_name, emoji):
-    id = emoji.get("id")
-    name = emoji.get("name")
-    print(f"Attempting to download :{name}: from {guild_name}")
-    emoji_bytes = None
-    while True:
-        try:
-            emoji_bytes = scrape_emoji(id)
-        except Exception as exception:
-            if exception == KeyboardInterrupt | exception == SystemExit:
-                print("KeyboardInterrupt/SystemExit caught! Terminating.")
-                raise
-            else:
-                print(f"Failed to get emoji :{name}: from {guild_name} , retrying!")
-        else:
-            print(f"Successfully got emoji :{name}: from {guild_name}")
-            break
-    return emoji_bytes
-    
 def is_int(str):
     try:
         int(str)
@@ -82,54 +58,88 @@ def is_int(str):
     except ValueError:
         return False
 
+def try_scraping(guild_name, sticker):
+    id = sticker.get("id")
+    name = sticker.get("name")
+    print(f"Attempting to download '{name}' from {guild_name}")
+    sticker_bytes = None
+    while True:
+        try:
+            sticker_bytes = scrape_sticker(id)
+        except Exception as exception:
+            if exception == KeyboardInterrupt | exception == SystemExit:
+                print("KeyboardInterrupt/SystemExit caught! Terminating.")
+                raise
+            else:
+                print(f"Failed to get emoji '{name}' from {guild_name} , retrying!")
+        else:
+            print(f"Successfully got emoji '{name}' from {guild_name}")
+            break
+    return sticker_bytes
+
 def scrape(config):
     if not os.path.isdir(config.get("path")):
         os.mkdir(config.get("path"))
     servers = config.get("guilds")
     for server in servers:
-        emojis = get_list_of_emojis(server, config.get("token"))
+        stickers = get_list_of_stickers(server, config.get("token"))
         guild_name = get_guild_name(server, config.get("token"))
-        if guild_name == None | emojis == None:
+        if guild_name == None | stickers == None:
             print(f"Guild {server} is incorrect/doesn't exist/fail to fetch guild name or stickers.")
             continue
         cooldownsec = config.get("cooldownsec")
         make_server_dir(guild_name, config) #TODO technically if the server name had special characters (not-ASCII chars) it's gonna break so add support for that "somehow"
         count = 0
-        print(f"Starting emoji download for server {guild_name}")
-        for emoji in emojis:
-            if (not config.get("cooldownperemoji") <= 0) & (count >= config.get("cooldownperemoji")):
+        print(f"Starting sticker download for server {guild_name}")
+        for sticker in stickers:
+            if (not config.get("cooldownpersticker") <= 0) & (count >= config.get("cooldownpersticker")):
                 print(f"\nCooldown reached! Cooling down for {cooldownsec} seconds.")
                 time.sleep(cooldownsec)
                 count = 0
                 print("Continuing from cooldown\n")
-            emoji_bytes = try_scraping(guild_name, emoji)
-            save(emoji_bytes, os.path.join(config.get("path"), guild_name, (emoji.get("name") + get_image_file_extension_from_bytes(emoji_bytes))))
+            sticker_bytes = try_scraping(guild_name, sticker)
+            if sticker.get("format_type") == 1:
+                save(sticker_bytes, os.path.join(config.get("path"), guild_name, (sticker.get("name") + ".png")))
+            else:
+                if config.get("convertapngtogif"):
+                    pathorigin = os.path.join(config.get("path"), guild_name, (sticker.get("name") + "_original.apng"))
+                    pathconv = os.path.join(config.get("path"), guild_name, (sticker.get("name") + ".gif"))
+                    stickername = sticker.get("name")
+                    save(sticker_bytes, pathorigin)
+                    apnggif(pathorigin, pathconv)
+                    print(f"Converted animated sticker '{stickername} from {guild_name}'")
+                else:
+                    save(sticker_bytes, os.path.join(config.get("path"), guild_name, (sticker.get("name") + ".apng")))
             count += 1
-        print(f"Finished downloading emojis from {guild_name}")
+        print(f"Finished downloading stickers from {guild_name}")
 
 def main():
     print(info)
     while True:
-        config = {"token":"", "guilds":[], "path":os.getcwd()+"/Emojis", "cooldownsec":0, "cooldownperemoji":0}
+        config = {"token":"", "guilds":[], "path":os.getcwd()+"/Stickers", "cooldownsec":0, "cooldownpersticker":0, "convertapngtogif":False}
         config["token"] = input("Please enter your discord token (https://youtu.be/YEgFvgg7ZPI for help): ")
 
         while True:
-            id = input("Enter the guild/server ID you want to scrape for emojis (when you are done, just press enter, https://youtu.be/6dqYctHmazc for help): ")
+            id = input("Enter the guild/server ID you want to scrape for stickers (when you are done, just press enter, https://youtu.be/6dqYctHmazc for help): ")
             if is_none_empty_whitespace(id): break
             elif not is_int(id): print("Incorrect guild id.")
             else: config["guilds"].append(id)
         
-        file_path = input("Where would you like to save your emojis? (Press enter to use the current directory): ")
+        file_path = input("Where would you like to save your stickers? (Press enter to use the current directory): ")
         if not is_none_empty_whitespace(file_path):
             config["path"] = file_path
         
-        cooldownperemoji = input("Enter cooldown trigger per emoji (type nothing or 0 to continue without cooldown): ")
-        if (is_int(cooldownperemoji)): config["cooldownperemoji"] = int(cooldownperemoji)
+        cooldownperemoji = input("Enter cooldown trigger per sticker (type nothing or 0 to continue without cooldown): ")
+        if (is_int(cooldownperemoji)): config["cooldownpersticker"] = int(cooldownperemoji)
 
-        if config["cooldownperemoji"] != 0:
+        if config["cooldownpersticker"] != 0:
             cooldownsec = input("Enter the cooldown time in seconds: ")
             if (not is_none_empty_whitespace(cooldownsec)) & (not is_int(cooldownsec)): break
             else: config["cooldownsec"] = int(cooldownsec)
+        
+        convertapngtogif = input("Would you like to convert apng files (animated stickers) to gif? Leave blank to disable (if this is enabled then original animated sticker files will have '_original' appended between their name and the file extension): ")
+        if not is_none_empty_whitespace(convertapngtogif):
+            config["convertapngtogif"] = True
 
         print("\n")
         print(config)
