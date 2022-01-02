@@ -1,5 +1,5 @@
-import os, subprocess, sys, time
-subprocess.check_call([sys.executable, "-m", "pip", "install", "requests"])
+#!/usr/bin/env python
+import os, time
 import requests
 
 warning_info = '''
@@ -65,7 +65,7 @@ def try_scraping(guild_name, emoji):
         try:
             emoji_bytes = scrape_emoji(id)
         except Exception as exception:
-            if exception == KeyboardInterrupt | exception == SystemExit:
+            if exception == KeyboardInterrupt or exception == SystemExit:
                 print("KeyboardInterrupt/SystemExit caught! Terminating.")
                 raise
             else:
@@ -89,7 +89,7 @@ def scrape(config):
     for server in servers:
         emojis = get_list_of_emojis(server, config.get("token"))
         guild_name = get_guild_name(server, config.get("token"))
-        if guild_name == None | emojis == None:
+        if guild_name == None or emojis == None:
             print(f"Guild {server} is incorrect/doesn't exist/fail to fetch guild name or stickers.")
             continue
         cooldownsec = config.get("cooldownsec")

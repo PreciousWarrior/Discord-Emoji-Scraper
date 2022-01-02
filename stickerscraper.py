@@ -1,6 +1,5 @@
-import os, subprocess, sys, time
-subprocess.check_call([sys.executable, "-m", "pip", "install", "requests"])
-subprocess.check_call([sys.executable, "-m", "pip", "install", "apnggif"])
+#!/usr/bin/env python
+import os, time
 import requests
 from apnggif import apnggif
 
@@ -67,7 +66,7 @@ def try_scraping(guild_name, sticker):
         try:
             sticker_bytes = scrape_sticker(id)
         except Exception as exception:
-            if exception == KeyboardInterrupt | exception == SystemExit:
+            if exception == KeyboardInterrupt or exception == SystemExit:
                 print("KeyboardInterrupt/SystemExit caught! Terminating.")
                 raise
             else:
@@ -84,7 +83,7 @@ def scrape(config):
     for server in servers:
         stickers = get_list_of_stickers(server, config.get("token"))
         guild_name = get_guild_name(server, config.get("token"))
-        if guild_name == None | stickers == None:
+        if guild_name == None or stickers == None:
             print(f"Guild {server} is incorrect/doesn't exist/fail to fetch guild name or stickers.")
             continue
         cooldownsec = config.get("cooldownsec")
