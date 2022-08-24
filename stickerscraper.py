@@ -41,14 +41,14 @@ def get_guild_name(guild_id, token):
     return result.json().get("name")
 
 def save(img_bytes, path):
-    imagefile = open(path, 'wb')
+    imagefile = open(path.replace('*', '-').replace('<', '-').replace('>', '-').replace('/', '-').replace('|', '-').replace(':', '-').replace('*', '-').replace('?', '-'), 'wb')
     imagefile.write(img_bytes)
     imagefile.close()
 
 def make_server_dir(server, config):
     dir_path = os.path.join(config.get("path"), server)
     if not os.path.isdir(dir_path):
-        os.mkdir(dir_path)
+        os.mkdir(dir_path.replace('*', '-').replace('<', '-').replace('>', '-').replace('/', '-').replace('|', '-').replace(':', '-').replace('*', '-').replace('?', '-'))
 
 def is_int(str):
     try:
