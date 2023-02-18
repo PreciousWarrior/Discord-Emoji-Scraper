@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os, time
-import requests
+import re, requests
+import platform
 
 warning_info = '''
 WARNING! Using this tool will break the Discord TOS since you will be scraping their website.
@@ -37,7 +38,10 @@ def scrape_emoji(id, proxy=None):
 
 def get_guild_name(guild_id, token):
     result=requests.get(url=f"https://discordapp.com/api/v7/guilds/{guild_id}", headers={"authorization":token})
-    return result.json().get("name")
+    if platform.system() == "Windows":
+        return re.sub(r"[<>:\"/\\|?*]", '-', result.json().get("name"))
+    else:
+        return result.json().get("name")  
 
 def get_image_file_extension_from_bytes(image_bytes):
     if str(image_bytes)[0:7].find("PNG") != -1:
