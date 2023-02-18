@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os, time
-import requests
+import re, requests
+import platform
 from apnggif import apnggif
 
 warning_info = '''
@@ -38,17 +39,20 @@ def scrape_sticker(id, proxy=None):
 
 def get_guild_name(guild_id, token):
     result=requests.get(url=f"https://discordapp.com/api/v7/guilds/{guild_id}", headers={"authorization":token})
-    return result.json().get("name")
+    if platform.system() == "Windows":
+        return re.sub(r"[<>:\"/\\|?*]", '-', result.json().get("name"))
+    else:
+        return result.json().get("name")    
 
 def save(img_bytes, path):
-    imagefile = open(path.replace('*', '-').replace('<', '-').replace('>', '-').replace('/', '-').replace('|', '-').replace(':', '-').replace('*', '-').replace('?', '-'), 'wb')
+    imagefile = open(path, 'wb')
     imagefile.write(img_bytes)
     imagefile.close()
 
 def make_server_dir(server, config):
     dir_path = os.path.join(config.get("path"), server)
     if not os.path.isdir(dir_path):
-        os.mkdir(dir_path.replace('*', '-').replace('<', '-').replace('>', '-').replace('/', '-').replace('|', '-').replace(':', '-').replace('*', '-').replace('?', '-'))
+        os.mkdir(dir_path)
 
 def is_int(str):
     try:
