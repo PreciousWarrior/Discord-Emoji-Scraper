@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import os, time
-import requests
+import re, requests
 from apnggif import apnggif
+import platform
 
 warning_info = '''
 WARNING! Using this tool will break the Discord TOS since you will be scraping their website.
@@ -38,7 +39,10 @@ def scrape_sticker(id, proxy=None):
 
 def get_guild_name(guild_id, token):
     result=requests.get(url=f"https://discordapp.com/api/v7/guilds/{guild_id}", headers={"authorization":token})
-    return result.json().get("name")
+    if platform.system() == "Windows":
+        return re.sub(r"[<>:\"/\\|?*]", '-', result.json().get("name"))
+    else:
+        return result.json().get("name")  
 
 def save(img_bytes, path):
     imagefile = open(path, 'wb')
